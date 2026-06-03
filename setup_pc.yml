@@ -1,0 +1,89 @@
+---
+- name: Configure Windows Workstation
+  hosts: localhost
+  gather_facts: no
+  
+  vars:
+    git_username: "Your Name"
+    git_email: "your.email@example.com"
+    
+    # List of VS Code Extensions to install using their Marketplace IDs
+    vscode_extensions:
+      - pkief.material-icon-theme          # Material UI Icons
+      - redhat.java                        # Java (Language Support by Red Hat)
+      - vscjava.vscode-java-pack           # Java Extension Pack (Highly recommended)
+      - JohnPapa.Angular2                  # Angular Snippets (by John Papa)
+      - eamodio.gitlens                    # GitLens
+      - Postman.postman-for-vscode         # Postman
+      - cweijan.vscode-mysql-client2       # MySQL Explorer / Client
+
+  tasks:
+    # 1. Install Apps via Chocolatey (Now including Google Chrome)
+    - name: Install core development applications via Chocolatey
+      win_chocolatey:
+        name:
+          - googlechrome
+          - git
+          - cmder
+          - vscode
+          - mysql.workbench
+        state: present
+
+    # 2. Configure Global Git Settings
+    - name: Configure global Git username
+      win_shell: "git config --global user.name '{{ git_username }}'"
+      args:
+        executable: powershell
+
+    - name: Configure global Git email
+      win_shell: "git config --global user.email '{{ git_email }}'"
+      args:
+        executable: powershell
+
+    # 3. Install VS Code Extensions
+    - name: Install VS Code Extensions
+      win_shell: "code --install-extension {{ item }} --force"
+      args:
+        executable: powershell
+      loop: "{{ vscode_extensions }}"
+      register: extension_result
+      changed_when: "'was successfully installed' in extension_result.stdout"
+
+    # 4. Install MySQL Server and ensure the service is running
+    - name: Install MySQL Server
+      win_chocolatey:
+        name: mysql
+        state: present
+
+    - name: Ensure MySQL Service is running
+      win_service:
+        name: MySQL
+        start_mode: auto
+        state: started
+
+    # 5. Install Java JDK 21
+    - name: Install Microsoft OpenJDK 21
+      win_chocolatey:
+        name: microsoft-openjdk
+        version: '21.0.0'
+        state: present
+
+    # 6. Install NVM (Node Version Manager) for Windows
+    - name: Install NVM for Windows
+      win_chocolatey:
+        name: nvm
+        state: present
+
+    # 7. Install Node.js via NVM and set up Angular CLI
+    - name: Install latest LTS Node.js using NVM
+      win_shell: |
+        nvm install lts
+        nvm use lts
+      args:
+        executable: powershell
+
+    - name: Install Global NPM Packages (Angular CLI)
+      win_shell: |
+        npm install -g @angular/cli
+      args:
+        executable: powershell
