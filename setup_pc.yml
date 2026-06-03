@@ -1,6 +1,6 @@
 ---
 - name: Configure Windows Workstation
-  hosts: localhost
+  hosts: all
   gather_facts: no
   
   vars:
