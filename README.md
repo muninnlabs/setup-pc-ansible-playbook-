@@ -141,6 +141,37 @@ Save the primary task orchestration blueprint code here:
 ###🚀 Execution Guide
 Once your initialization parameters inside inventory.ini and variables inside setup_pc.yml are modified, launch the environment builder utilizing the ansible-playbook execution runner command:
 
+
+
+Option 1: Run it directly from the same Windows PC (Easiest)
+Ansible is natively built for Linux/Unix systems, so it cannot be installed directly on standard Windows PowerShell. However, you can use WSL (Windows Subsystem for Linux) to run it on your own computer.
+
+Install WSL (Ubuntu): Open your PowerShell as Administrator and run:
+
+PowerShell
+```
+wsl --install
+Restart your PC when prompted.
+```
+Open Ubuntu: Search for "Ubuntu" in your Windows Start Menu and open it. It will ask you to create a username and password.
+
+Install Ansible inside Ubuntu: Run these commands one by one in the Ubuntu terminal:
+```
+Bash
+sudo apt update
+sudo apt install software-properties-common -y
+sudo apt-add-repository --ppsppa:ansible/ansible -y
+sudo apt update
+sudo apt install ansible -y
+Navigate to your files: Your Windows C: drive is shared inside WSL. If your folder is on your Desktop, you can access it in Ubuntu by running:
+```
+Bash
+cd /mnt/c/Users/YOUR_WINDOWS_USERNAME/Desktop/setup/
+(Replace YOUR_WINDOWS_USERNAME with your actual Windows account name. Use ls to make sure you see your setup_pc.yml and inventory.ini files).
+
+Run the playbook:
+
+Bash
 ```
 ansible-playbook -i inventory.ini setup_pc.yml
 ```
